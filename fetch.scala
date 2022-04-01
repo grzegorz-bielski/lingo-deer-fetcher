@@ -1,25 +1,19 @@
-// #!/usr/bin/env -S scala-cli shebang
-
 //> using scala "3.1.1"
 //> using lib "com.softwaremill.sttp.client3::core:3.5.1"
 //> using lib "com.softwaremill.sttp.client3::async-http-client-backend-fs2:3.5.1"
 
 import sttp.client3.asynchttpclient.fs2.AsyncHttpClientFs2Backend
-import sttp.client3._
+import sttp.client3.*
 import sttp.capabilities.fs2.Fs2Streams
 
-import cats.effect.{IO, IOApp, Concurrent}
-import cats.effect.std.Console
 import cats.syntax.all.given
-import cats.Show
-import cats.data.Kleisli
+import cats.{Traverse, Parallel}
+
+import cats.effect.{IO, IOApp, Concurrent}
+import cats.effect.std.{Console, Semaphore}
 
 import fs2.{Stream, text}
 import fs2.io.file.{Files, Path}
-import cats.effect.kernel.Par
-import cats.Traverse
-import cats.effect.std.Semaphore
-import cats.Parallel
 
 val jpLevelTwoTips =
   (1 to 62).map(n => Tip(level = 2, lesson = n, language = "jp")).toVector
@@ -30,9 +24,9 @@ object App extends IOApp.Simple:
 case class Tip(level: Int, lesson: Int, language: Tip.Language):
   def dirOutput = s"output/${language}/${level}"
   def fileOutput = s"${dirOutput}/${lesson}.html"
-
   def src =
     uri"https://webjson.lingodeer.com/dataSource/level_${level}/${language}/grammarTip/${lesson}/en.html"
+
 object Tip:
   type Language = "jp"
 
